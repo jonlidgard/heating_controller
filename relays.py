@@ -1,13 +1,13 @@
 import wiringpi
 
+RELAY_PINS = [23,26,9,8]
 
 class Relay:
     def __init__(self, relay_no):
-        self._pins = [23,26,9,8]
-        if (relay_no < 1 or relay_no > len(self._pins)):
+        if (relay_no < 1 or relay_no > len(RELAY_PINS)):
             raise IndexError('Relay out of range')
         self._relay_no = relay_no
-        self._pin = self._pins[self._relay_no-1]
+        self._pin = RELAY_PINS[self._relay_no-1]
         wiringpi.pinMode(self._pin, 1)
 
     def set(self, state):
@@ -26,3 +26,26 @@ class Relay:
 
     def toggle(self):
         self.set(1-self.get())
+
+print (__name__)
+
+# Run tests
+if __name__ == "__main__":
+    import time
+    wiringpi.wiringPiSetup()
+
+    r1 = Relay(1)
+    r2 = Relay(2)
+    r3 = Relay(3)
+    r4 = Relay(4)
+    relays = [r1,r2,r3,r4]
+
+    for i in range(4):
+        r = relays[i]
+        r.off()
+
+    while True:
+        for i in range(4):
+            r = relays[i]
+            r.toggle()
+            time.sleep(.5)
