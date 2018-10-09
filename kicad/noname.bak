@@ -1,0 +1,54 @@
+EESchema Schematic File Version 4
+LIBS:power
+LIBS:device
+LIBS:74xx
+LIBS:audio
+LIBS:interface
+EELAYER 26 0
+EELAYER END
+$Descr A4 11693 8268
+encoding utf-8
+Sheet 1 1
+Title ""
+Date ""
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L Connector:Raspberry_Pi_2_3 J?
+U 1 1 5BA39ED0
+P 5150 3350
+F 0 "J?" H 5150 4828 50  0000 C CNN
+F 1 "Raspberry_Pi_2_3" H 5150 4737 50  0000 C CNN
+F 2 "" H 5150 3350 50  0001 C CNN
+F 3 "https://www.raspberrypi.org/documentation/hardware/raspberrypi/schematics/rpi_SCH_3bplus_1p0_reduced.pdf" H 5150 3350 50  0001 C CNN
+	1    5150 3350
+	1    0    0    -1  
+$EndComp
+$Comp
+L Analog_ADC:MCP3008 U?
+U 1 1 5BA3A003
+P 1650 1450
+F 0 "U?" H 1650 2128 50  0000 C CNN
+F 1 "MCP3008" H 1650 2037 50  0000 C CNN
+F 2 "" H 1750 1550 50  0001 C CNN
+F 3 "http://ww1.microchip.com/downloads/en/DeviceDoc/21295d.pdf" H 1750 1550 50  0001 C CNN
+	1    1650 1450
+	1    0    0    -1  
+$EndComp
+$Comp
+L Connector:Conn_01x03_Male J?
+U 1 1 5BA3C4A2
+P 700 1150
+F 0 "J?" H 806 1428 50  0000 C CNN
+F 1 "Conn_01x03_Male" H 806 1337 50  0000 C CNN
+F 2 "" H 700 1150 50  0001 C CNN
+F 3 "~" H 700 1150 50  0001 C CNN
+	1    700  1150
+	1    0    0    -1  
+$EndComp
+$EndSCHEMATC

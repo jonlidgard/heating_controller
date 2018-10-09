@@ -1,0 +1,11 @@
+{
+  "autoConnect": true,
+  "connection": {
+    "host": "heatingcontroller.local",
+    "username": "pi",
+    "privateKey": "/Users/jon/.ssh/id_rsa",
+    "port": "22"
+  },
+  "basePath": "./hc/",
+  "ignore": [".git", "src/node_modules"]
+}

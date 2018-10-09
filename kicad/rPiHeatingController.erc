@@ -1,0 +1,11 @@
+ERC report (Thursday, 20 September 2018 at 15:07:27, Encoding UTF8 )
+
+***** Sheet /
+ErrType(3): Pin connected to some others pins but no pin to drive it
+    @ (219.71 mm,74.93 mm): Pin 1 (Power input) of component J10 is not driven (Net 21).
+ErrType(3): Pin connected to some others pins but no pin to drive it
+    @ (359.41 mm,111.76 mm): Pin 1 (Power input) of component #PWR0128 is not driven (Net 37).
+ErrType(3): Pin connected to some others pins but no pin to drive it
+    @ (219.71 mm,140.97 mm): Pin 30 (Power input) of component J10 is not driven (Net 47).
+
+ ** ERC messages: 3  Errors 0  Warnings 3
