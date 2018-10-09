@@ -8,7 +8,11 @@ def pinMode(a,b):
     c = a
     c = b
 
-def pinWrite(a,b): 
+def digitalWrite(a,b): 
+    c = a
+    c = b
+
+def DigitalRead(a): 
     c = a
     c = b
 

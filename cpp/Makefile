@@ -1,0 +1,74 @@
+#
+# Makefile:
+#	wiringPi - A "wiring" library for the Raspberry Pi
+#	https://projects.drogon.net/wiring-pi
+#
+#	Copyright (c) 2012-2015 Gordon Henderson
+#################################################################################
+# This file is part of wiringPi:
+#	Wiring Compatable library for the Raspberry Pi
+#
+#    wiringPi is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU Lesser General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    wiringPi is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU Lesser General Public License for more details.
+#
+#    You should have received a copy of the GNU Lesser General Public License
+#    along with wiringPi.  If not, see <http://www.gnu.org/licenses/>.
+#################################################################################
+
+ifneq ($V,1)
+Q ?= @
+endif
+
+#DEBUG	= -g -O0
+DEBUG	= -O3
+CC = /pitools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian-x64/bin/arm-linux-gnueabihf-g++
+INCLUDE	= -I. -I../usr/local/include
+CFLAGS	= $(DEBUG) -Wall $(INCLUDE) -Winline -pipe
+
+LDFLAGS	= -L/build/usr/local/lib
+LDLIBS    = -lwiringPi -lwiringPiDev -lpthread -lm -lcrypt -lrt
+
+# Should not alter anything below this line
+###############################################################################
+
+SRC	=	DigiPotX9Cxxx.cpp
+
+OBJ	=	$(SRC:.cpp=.o)
+
+BINS	=	$(SRC:.cpp=)
+
+all:	$(BINS)
+
+DigiPotX9Cxxx:	DigiPotX9Cxxx.o
+	$Q echo [link]
+	$Q $(CC) -shared -Wl,-soname,libDigiPotX9C.so -o libDigiPotX9C.so DigiPotX9Cxxx.o -fPIC $(LDFLAGS) $(LDLIBS)
+#	$Q $(CC) -o $@ DigiPotX9Cxxx.o $(LDFLAGS) $(LDLIBS)
+
+
+x9c10x:	x9c10x.o
+	$Q echo [link]
+	$Q $(CC) -o $@ x9c10x.o $(LDFLAGS) $(LDLIBS)
+
+.cpp.o:
+	$Q echo [CC] $<
+	$Q $(CC) -c $(CFLAGS) $< -o $@
+
+clean:
+	$Q echo "[Clean]"
+	$Q rm -f $(OBJ) *~ core tags $(BINS)
+
+tags:	$(SRC)
+	$Q echo [ctags]
+	$Q ctags $(SRC)
+
+depend:
+	makedepend -Y $(SRC)
+
+# DO NOT DELETE

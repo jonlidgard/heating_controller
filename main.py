@@ -29,7 +29,7 @@ def cfh_state_changed(cfh):
         zv.open()
     else:
         zv.close()
-        
+
 def zone_valve_state_changed(zv):
     any_valve_open = False
     for ch in range( len(valves) ):
@@ -45,8 +45,6 @@ def zone_valve_state_changed(zv):
         boiler.set_mode("comfort", 30) #ensure boiler comes on
     else
         boiler.set_mode("frost", 0) #revert to frost protection
-
-
 
 
 def loop():
