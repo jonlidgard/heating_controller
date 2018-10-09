@@ -11,7 +11,7 @@ class CFH:
         self._cfh_no = cfh_no
         pin = CFH_PINS[cfh_no-1]
         wiringpi.pinMode(pin, 0)
-        self._pin_state = {'pin': pin, 'old': -1, 'new': -1, 'stable': -1, 'samples': -1}
+        self._pin_state = {'pin': pin, 'changed': False, 'new': -1, 'stable': -1, 'samples': -1}
 
     def get_channel(self):
         return self._cfh_no
@@ -19,18 +19,16 @@ class CFH:
     def get_state(self):
         return self._pin_state['stable']
 
-    def get_contact_state(self):        
+    def check_contact_state(self):        
         # get the new pin state
         self._pin_state['new'] = 1-wiringpi.digitalRead(self._pin_state['pin'])
         self._pin_state = bounce_check(self._pin_state)
 
-        return self._pin_state['stable']
-
     def poll(self):
-        self.get_contact_state()
-        print (self._pin_state)
-        if self._pin_state['old']  != self._pin_state['stable']:
-            print ('Notify')
+        self.check_contact_state()
+#        print (self._pin_state)
+        if self._pin_state['changed'] == True:
+            self._pin_state['changed'] = False
             self._notifier(self) 
 
 # Tests
@@ -51,6 +49,5 @@ if __name__ == "__main__":
 
     while True:
         for cfh in cfhs:
-            print ("Running")
             cfh.poll()
-        time.sleep(.5)
+        time.sleep(.2)

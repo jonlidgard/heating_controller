@@ -13,7 +13,7 @@ class ZoneValve:
         self._valve_no = valve_no
         pin = LIMIT_PINS[valve_no-1] 
         wiringpi.pinMode(pin, 0)
-        self._pin_state = {'pin': pin, 'old': -1, 'new': -1, 'stable': -1, 'samples': -1}
+        self._pin_state = {'pin': pin, 'changed': False, 'new': -1, 'stable': -1, 'samples': -1}
 
         self._relay = Relay(valve_no)
         self._valve_state = {'current': 'unknown', 'changed': False}

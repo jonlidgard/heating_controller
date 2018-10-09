@@ -5,34 +5,31 @@ BOUNCE_COUNT = 5
 def bounce_check(pin_state):
     # only change state after 5 stable samples
     # When first called after startup callee doesn't know BOUNCE_COUNT so is set to -1
-    if (pin_state['samples'] < 1):
-#        print ('Setting sample count on first call')
-        pin_state['samples'] = BOUNCE_COUNT
 
-    # only on startup as old_state = -1 as unknown
-    if pin_state['old'] !=0 and pin_state['old'] != 1:
-#        print ('Setting pin_state on 1st call')
-        pin_state['old'] = pin_state['new']
-
-#    if pin_state['stable'] >-1 and :
+    # When samples is zero we are not doing a bounce check
+    if pin_state['samples'] == 0:
+        if pin_state['new'] == pin_state['stable']:
+            return pin_state
+    
+    # if we've detected a state change do the bounce timeout
 
     # dec bounce count if a stable sample
-    if pin_state['new'] == pin_state['old']:
-#        print ('Stable')
-        pin_state['samples'] -= 1
+    if pin_state['new'] != pin_state['stable']:
+        if (pin_state['samples'] < 1):
+            pin_state['samples'] = BOUNCE_COUNT
+        else:
+            pin_state['samples'] -= 1
     else:
-        # else reset the count
-#        print ('Unstable')
+        # if here we are in a boune_timeout as a change of state detected between
+        # new & stable but now stable == new so we must have had a bounce during
+        # this period so reset the timeout count
         pin_state['samples'] = BOUNCE_COUNT
 
     # if not yet finised sampling just return the old state
-    if pin_state['samples'] > 0:
-#        print ('Waiting for stable')
-        pin_state['stable'] = pin_state['old']
-    else:
+    if pin_state['samples'] == 0:
         # if here we've had a period of stability on the pin so update state
-        print ('Updating stable')
+        pin_state['changed'] = True
+
         pin_state['stable'] = pin_state['new']
-        pin_state['samples'] = BOUNCE_COUNT
 
     return pin_state
