@@ -1,7 +1,14 @@
 #!/bin/sh -e
 
+# IMPORTANT
+# Designed to be built in a Docker Container containing Arm cross-compile tools (/pitools)
+# See https://jonsblog.lidgard.uk/post/cross-compile/
+# Copy cpp folder to WiringPi root directory
+# Copy this script to  WiringPi root directory:
+# Hint: should have cpp * build-examples
+
 rm /etc/ld.so.conf.d/*.conf 
 cp ./libcross.conf /etc/ld.so.conf.d/
 
-cd mycode
-make clean && make DigiPotX9Cxxx
+cd cpp
+make clean && make digiPotX9Cxxx

@@ -27,7 +27,6 @@ class Relay:
     def toggle(self):
         self.set(1-self.get())
 
-print (__name__)
 
 # Run tests
 if __name__ == "__main__":

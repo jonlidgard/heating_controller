@@ -87,3 +87,20 @@ class TR2:
 
     def get_sensed(self):
         return get_sensed
+
+
+# Run tests
+if __name__ == "__main__":
+
+    import time
+    
+    # Main program loop.
+    while True:
+        # Read all the ADC channel values in a list.
+        my_tr2 = TR2() 
+        values = my_tr2.read()
+
+        # Print the ADC values.
+        print(values)
+        # Pause for half a second.
+        time.sleep(.5)

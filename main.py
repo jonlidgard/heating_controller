@@ -1,10 +1,10 @@
-import time, tr2, boiler, zonevalve, cfh, wiringpi
+import time, TR2, Boiler, zonevalve, cfh, wiringpi
 
 def setup():
     wiringpi.wiringPiSetup()
 
-    boiler = boiler.Boiler()
-    tr2 = tr2.TR2()
+    boiler = Boiler.Boiler()
+    tr2 = TR2.TR2()
     zv1 = zonevalve.ZoneValve(1, zone_valve_state_changed)
     zv2 = zonevalve.ZoneValve(2, zone_valve_state_changed)
     zv3 = zonevalve.ZoneValve(3, zone_valve_state_changed)
@@ -54,3 +54,10 @@ def loop():
         cfh.poll()
 
 
+
+if __name__ == "__main__":
+    setup()
+
+    while True:
+        loop()
+        time.sleep(.5)
