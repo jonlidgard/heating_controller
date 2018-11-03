@@ -31,6 +31,11 @@ class Relay:
 # Run tests
 if __name__ == "__main__":
     import time
+    import sys, getopt
+    
+    argv = sys.argv[1:]
+    opts, args = getopt.getopt(argv,"htr:s:",["relay=","state="])
+    
     wiringpi.wiringPiSetup()
 
     r1 = Relay(1)
@@ -43,8 +48,27 @@ if __name__ == "__main__":
         r = relays[i]
         r.off()
 
-    while True:
-        for i in range(4):
-            r = relays[i]
-            r.toggle()
-            time.sleep(.5)
+    relay = -1
+    state = -1    
+    for opt, arg in opts:
+      if opt == '-h':
+         print 'relay.py -r <relay> -s <0/1>'
+         sys.exit()
+      elif opt in ("-r", "--relay"):
+         relay = int(arg)-1
+      elif opt in ("-s", "--state"):
+         state = int(arg)
+      elif opt in ("-t"):
+         while True:
+            for i in range(4):
+                r = relays[i]
+                r.toggle()
+                time.sleep(5)
+
+      if relay > -1:
+        if state == 0:
+          relays[relay].off() 
+        elif state == 1:
+          relays[relay].on()
+        else:
+          relays[relay].toggle()

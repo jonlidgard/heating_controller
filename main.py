@@ -3,6 +3,11 @@ import time, TR2, Boiler, zonevalve, cfh, wiringpi
 def setup():
     wiringpi.wiringPiSetup()
 
+    global boiler
+    global tr2 
+    global valves
+    global call_for_heats
+ 
     boiler = Boiler.Boiler()
     tr2 = TR2.TR2()
     zv1 = zonevalve.ZoneValve(1, zone_valve_state_changed)
@@ -14,9 +19,10 @@ def setup():
     cfh2 = cfh.CFH(2,cfh_state_changed)
     cfh3 = cfh.CFH(3,cfh_state_changed)
     call_for_heats = [cfh1,cfh2,cfh3]
-
-    boiler.set_mode("comfort", 10) #no call for heat
-
+ 
+    # boiler.set_temp(2000) 
+    boiler.off()
+   
     for v in valves:
         v.close()
 
@@ -24,7 +30,7 @@ def setup():
 def cfh_state_changed(cfh):
     ch = cfh.get_channel()
     zv = valves[ch]
-    if cfh.get_current_state() == True:
+    if cfh.get_state() == True:
         zv.open()
     else:
         zv.close()
@@ -36,14 +42,18 @@ def zone_valve_state_changed(zv):
         cfh = call_for_heats[ch]
         zv = valves[ch]
         # Only want boiler on if valve is open & a valid call for heat on that channel
-        if zv.get_current_state() == "open" and cfh.get_current_state() == True:
+        print ('Valve',ch,zv.get_state(),'CFH',cfh.get_state())
+        if zv.get_state() == "open" and cfh.get_state() == True:
             any_valve_open = True
             break
 
     if any_valve_open:
-        boiler.set_mode("comfort", 30) #ensure boiler comes on
+       print ('Boiler:ON')
+       # boiler.on()
+        
     else:
-        boiler.set_mode("frost", 0) #revert to frost protection
+       print ('Boiler:OFF')
+       # boiler.off()
 
 
 def loop():

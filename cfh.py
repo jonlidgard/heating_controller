@@ -45,7 +45,7 @@ if __name__ == "__main__":
     cfh1 = CFH(1, printState)
     cfh2 = CFH(2, printState)
     cfh3 = CFH(3, printState)
-    cfhs = [cfh1] #,cfh2,cfh3]
+    cfhs = [cfh1,cfh2,cfh3]
 
     while True:
         for cfh in cfhs:

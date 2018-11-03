@@ -6,7 +6,7 @@ tr2_mode_comfort_resistance = 8960
 tr2_mode_frost_resistance = 12650
 tr2_mode_night_resistance = 13960
 tr2_max_setpoint_resistance = 2200
-tr2_max_sensed_resistance = 3000
+tr2_max_sensed_resistance = 4900
 tr2_setpoint_factor= 30.0 / tr2_max_setpoint_resistance
 tr2_sensed_factor = 30.0 / tr2_max_sensed_resistance
 
@@ -74,7 +74,7 @@ class TR2:
         _mode, _setpoint = self.get_mode_and_setpoint_from_raw(mode_raw)
 
         sensed_resistance = tr2_sensed_bias_resistance * sensed_raw / (1024.0 - sensed_raw)
-        _sensed = int(sensed_resistance * tr2_sensed_factor)
+        _sensed = int(sensed_resistance * tr2_sensed_factor*10) / 10
         # Need to get this to increase as resistance decreases
         return {"mode": _mode, "setpoint": _setpoint, "sensed": _sensed}
 
@@ -86,7 +86,7 @@ class TR2:
         return _setpoint
 
     def get_sensed(self):
-        return get_sensed
+        return _sensed
 
 
 # Run tests

@@ -1,5 +1,5 @@
 import ctypes
-lib = ctypes.cdll.LoadLibrary('./libDigiPotX9C.so')
+lib = ctypes.cdll.LoadLibrary('libDigiPotX9C.so')
 class DigiPot(object):
     def __init__(self, incPin, udPin, csPin):
         lib.DigiPot_new.argtypes = [ctypes.c_ushort, ctypes.c_ushort, ctypes.c_ushort]
@@ -35,7 +35,7 @@ class DigiPot(object):
         return lib.DigiPot_set(self.obj, val)
 
     def increase(self, amount):
-        return DigiPot_increase(self.obj, amount)
+        return lib.DigiPot_increase(self.obj, amount)
 
     def decrease(self, amount):
         return lib.DigiPot_decrease(self.obj, amount)
