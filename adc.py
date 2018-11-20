@@ -22,3 +22,18 @@ def read_analog():
         # The read_adc function will get the value of the specified channel (0-7).
         values[i] = mcp.read_adc(i)
     return values
+
+# Run tests
+if __name__ == "__main__":
+
+    import time
+
+    # Main program loop.
+    while True:
+        # Read all the ADC channel values in a list.
+        values = read_analog()
+
+        # Print the ADC values.
+        print(values)
+        # Pause for half a second.
+        time.sleep(.5)

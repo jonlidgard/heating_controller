@@ -19,9 +19,11 @@ class Relay:
         return 1 - wiringpi.digitalRead(self._pin)
 
     def on(self):
+#        print ('ON')
         self.set(1)
 
     def off(self):
+#        print('OFF')
         self.set(0)
 
     def toggle(self):

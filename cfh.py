@@ -4,7 +4,8 @@ from common import bounce_check
 CFH_PINS = [7,21,22]
 
 class CFH:
-    def __init__(self,cfh_no, notifier):
+    def __init__(self,cfh_no, name, notifier):
+        self._name = name
         self._notifier = notifier
         if cfh_no < 1 or cfh_no > len(CFH_PINS):
             raise IndexError('CFH out of range')
@@ -15,6 +16,9 @@ class CFH:
 
     def get_channel(self):
         return self._cfh_no
+
+    def get_name(self):
+        return self._name
 
     def get_state(self):
         return self._pin_state['stable']
@@ -35,16 +39,16 @@ class CFH:
 
 def printState(cfh):
     state = (cfh.get_state())
-    print ('CFH:', cfh.get_channel(), '-', state)
+    print ('CFH:', cfh.get_channel(), cfh.get_name(),  '-', state)
 
 
 if __name__ == "__main__":
     import time
 
     wiringpi.wiringPiSetup()
-    cfh1 = CFH(1, printState)
-    cfh2 = CFH(2, printState)
-    cfh3 = CFH(3, printState)
+    cfh1 = CFH(1, 'Kitchen', printState)
+    cfh2 = CFH(2, 'Lounge', printState)
+    cfh3 = CFH(3, 'Landing', printState)
     cfhs = [cfh1,cfh2,cfh3]
 
     while True:
