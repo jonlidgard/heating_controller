@@ -1,4 +1,4 @@
-import wiringpi
+import wiringpi, logging
 from common import bounce_check
 
 CFH_PINS = [7,21,22]
@@ -13,6 +13,10 @@ class CFH:
         pin = CFH_PINS[cfh_no-1]
         wiringpi.pinMode(pin, 0)
         self._pin_state = {'pin': pin, 'changed': False, 'new': -1, 'stable': -1, 'samples': -1}
+
+
+        self._logger = logging.getLogger('heating')
+        self._logger.addHandler(logging.NullHandler())
 
     def get_channel(self):
         return self._cfh_no
@@ -33,6 +37,11 @@ class CFH:
 #        print (self._pin_state)
         if self._pin_state['changed'] == True:
             self._pin_state['changed'] = False
+            if self._logger.isEnabledFor(logging.DEBUG):
+                if self.get_state() == 1:
+                    self._logger.debug('%s calling for heat',self.get_name())
+                else:
+                    self._logger.debug('%s satisfied',self.get_name())
             self._notifier(self) 
 
 # Tests

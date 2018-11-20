@@ -3,7 +3,7 @@
 # Relay 3: Downstairs
 # Relay 4: Upstairs
 
-import logging, time, TR2, Boiler, zonevalve, cfh, relays, wiringpi
+import logging, time, Boiler, zonevalve, cfh, relays, wiringpi
 import pushover 
 
 
@@ -11,7 +11,7 @@ def setup():
     wiringpi.wiringPiSetup()
 
     global boiler
-    global tr2 
+    # global tr2 
     global valves
     global call_for_heats
     global ufh_pump
@@ -26,11 +26,11 @@ def setup():
 
     # create logger
     logger = logging.getLogger('heating')
-    logger.setLevel(logging.DEBUG)
+    # logger.setLevel(logging.DEBUG)
 
     # create console handler and set level to debug
     ch = logging.FileHandler(filename='/var/log/heating.log') #StreamHandler()
-    ch.setLevel(logging.INFO)
+    ch.setLevel(logging.DEBUG)
 
     # create formatter
     formatter = logging.Formatter('%(asctime)s - %(module)s - %(levelname)s - %(message)s')
@@ -48,7 +48,7 @@ def setup():
 
 
     boiler = Boiler.Boiler()
-    tr2 = TR2.TR2()
+    # tr2 = TR2.TR2()
     ufh_valve = zonevalve.ZoneValve(1, 'UFH', zone_valve_state_changed)
     downstairs_valve = zonevalve.ZoneValve(2, 'Downstairs', zone_valve_state_changed)
     upstairs_valve = zonevalve.ZoneValve(3, 'Upstairs', zone_valve_state_changed)
