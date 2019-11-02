@@ -96,7 +96,7 @@ def setup():
     ufh_pump_widget = nextion.TextWidget(3,"UFH Pump", nextion.OnOffStateWriter())
     boiler_widget = nextion.TextWidget(2,"Boiler", nextion.OnOffStateWriter())
 
-    display.add(kitchen_cfh_widget).add(lounge_cfh_widget).add(landing_cfh_widget).add(upstairs_valve_widget).add(downstairs_valve_widget).add(ufh_valve_widget).add(ufh_pump_widget, boiler_widget)
+    display.add(kitchen_cfh_widget).add(lounge_cfh_widget).add(landing_cfh_widget).add(upstairs_valve_widget).add(downstairs_valve_widget).add(ufh_valve_widget).add(ufh_pump_widget).add(boiler_widget)
 
     ufh_pump = DigitalControl(1, ufh_pump_widget)
     boiler = Boiler.Boiler(boiler_widget)
