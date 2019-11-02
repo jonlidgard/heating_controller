@@ -11,12 +11,26 @@ import nextion
 import time
 import struct
 
+class DigitalControl:
+    def __init__(self, relay_chan, widget):
+        self._relay = relays.Relay(relay_chan)
+        self._widget = widget
+    
+    def on(self):
+        self._relay.on()
+        self._widget.update(1)
+        logger.info(self._widget.text())
+
+    def off(self):
+        self._relay.off()
+        self._widget.update(0)
+        logger.info(self._widget.text())
 
 
 def setup():
     wiringpi.wiringPiSetup()
 
-    global nextion
+    global display
     global boiler
     # global tr2 
     global valves
@@ -50,58 +64,46 @@ def setup():
     logger.info('Heating Program Started')
 
     # Display
-    nextion = nextion.Nextion()
+    display = nextion.Nextion()
 
     # Pushover
     pushover_client = pushover.Client("u1nntc8b4zqy9p565krjpnq2wqfp6t", api_token="ayexnq66ykz79gdr8q4wx2tto6qri7")
     pushover_client.send_message("Heating Started", title="Info")
 
-    boiler = Boiler.Boiler()
     # tr2 = TR2.TR2()
-    ufh_valve_widget = TextWidget(4,"UFH Valve", new ValveStateWriter())
-    ufh_valve = zonevalve.ZoneValve(1, 'UFH', zone_valve_state_changed)
+    ufh_valve_widget = nextion.TextWidget(4,"UFH Valve", nextion.ValveStateWriter())
+    ufh_valve = zonevalve.ZoneValve(1, 'UFH', ufh_valve_widget, zone_valve_state_changed)
 
-    downstairs_valve_widget = TextWidget(6,"DN Valve", new ValveStateWriter())
-    downstairs_valve = zonevalve.ZoneValve(2, 'Downstairs', zone_valve_state_changed)
+    downstairs_valve_widget = nextion.TextWidget(6,"DN Valve", nextion.ValveStateWriter())
+    downstairs_valve = zonevalve.ZoneValve(2, 'Downstairs', downstairs_valve_widget, zone_valve_state_changed)
 
-    upstairs_valve_widget = TextWidget(5,"UP Valve", new ValveStateWriter())
-    upstairs_valve = zonevalve.ZoneValve(3, 'Upstairs', zone_valve_state_changed)
+    upstairs_valve_widget = nextion.TextWidget(5,"UP Valve", nextion.ValveStateWriter())
+    upstairs_valve = zonevalve.ZoneValve(3, 'Upstairs', upstairs_valve_widget, zone_valve_state_changed)
 
     valves = [ufh_valve, downstairs_valve, upstairs_valve]
 
-    kitchen_cfh_widget = TextWidget(1,"Kitchen CFH", new OnOffStateWriter())
-    kitchen_cfh = cfh.CFH(1, 'Kitchen', 'Kitchen CFH', 1, cfh_state_changed)
+    kitchen_cfh_widget = nextion.TextWidget(1,"Kitchen CFH", nextion.OnOffStateWriter())
+    kitchen_cfh = cfh.CFH(1, 'Kitchen', kitchen_cfh_widget, cfh_state_changed)
     
-    lounge_cfh_widget = TextWidget(0,"Lounge CFH", new OnOffStateWriter())
-    lounge_cfh = cfh.CFH(2, 'Lounge', 'Lounge CFH', 0, cfh_state_changed)
+    lounge_cfh_widget = nextion.TextWidget(0,"Lounge CFH", nextion.OnOffStateWriter())
+    lounge_cfh = cfh.CFH(2, 'Lounge', lounge_cfh_widget, cfh_state_changed)
     
-    landing_cfh_widget = TextWidget(-1,"Landing CFH", new OnOffStateWriter())
-    landing_cfh = cfh.CFH(3, 'Landing', 'Landind CFH', -1, cfh_state_changed)
+    landing_cfh_widget = nextion.TextWidget(-1,"Landing CFH", nextion.OnOffStateWriter())
+    landing_cfh = cfh.CFH(3, 'Landing', landing_cfh_widget, cfh_state_changed)
 
     call_for_heats = [kitchen_cfh, lounge_cfh, landing_cfh]
 
-    ufh_pump_widget = TextWidget(3,"UFH Pump", new OnOffStateWriter())
-    boiler_widget = TextWidget(2,"Boiler", new OnOffStateWriter())
+    ufh_pump_widget = nextion.TextWidget(3,"UFH Pump", nextion.OnOffStateWriter())
+    boiler_widget = nextion.TextWidget(2,"Boiler", nextion.OnOffStateWriter())
 
-    nextion
-        .add(kitchen_cfh_widget)
-        .add(lounge_cfh_widget)
-        .add(landing_cfh_widget)
-        .add(upstairs_valve_widget)
-        .add(downstairs_valve_widget)
-        .add(ufh_valve_widget)
-        .add(ufh_pump_widget)
+    display.add(kitchen_cfh_widget).add(lounge_cfh_widget).add(landing_cfh_widget).add(upstairs_valve_widget).add(downstairs_valve_widget).add(ufh_valve_widget).add(ufh_pump_widget, boiler_widget)
 
-    ufh_pump = relays.Relay(1)
-    ufh_pump_widget.update(0)
-    ufh_pump.off()
-    logger.info('UFH Pump: Stoppped')
+    ufh_pump = DigitalControl(1, ufh_pump_widget)
+    boiler = Boiler.Boiler(boiler_widget)
     
-    # boiler.set_temp(2000) 
-    boiler_widget.update(0)
     boiler.off()
    
-    nextion.refresh(True) // Refresh all
+    display.refresh(True) # Refresh all
     for v in valves:
         v.close()
 
@@ -135,12 +137,11 @@ def boiler_needs_on():
     return result
 
 def cfh_state_changed(cfh, name, state):
+    if name == 'Kitchen':
         if state == True:
             ufh_valve.open()
         else:
-            ufh_pump_widget.update(0)
             ufh_pump.off()
-            logger.info('UFH Pump: Stopped')
             ufh_valve.close()
     elif name  == 'Lounge': # Lounge
         if state == True:
@@ -149,33 +150,27 @@ def cfh_state_changed(cfh, name, state):
             ufh_state = ufh_valve.get_state()
             if ufh_state == 'closed' or ufh_state == 'closing':
                 downstairs_valve.close()
-    nextion.refresh()
+    display.refresh()
 
 
 def zone_valve_state_changed(zv, name, state):
     if name == 'UFH':
         if state == 'open':
-            ufh_pump_widget.update(1)
             ufh_pump.on()
-            logger.info('UFH Pump: Started')
             upstairs_valve.open() # Temp to ensure boiler has somewhere to pump the heat
-            logger.info('Downstairs Valve: Opened')
 
     elif name == 'Downstairs':
         if state == 'open':
             upstairs_state = upstairs_valve.get_state()
             if upstairs_state == 'closed' or upstairs_state == 'closing':            
                 upstairs_valve.open()
-                logger.info('Upstairs Valve: Opened')
 
     if boiler_needs_on():
-       boiler_widget.update(1)
        boiler.on()
     else:
-       boiler_widget.update(0)
        boiler.off()
 
-    nextion.refresh()
+    display.refresh()
 
 
 def loop():
@@ -184,6 +179,8 @@ def loop():
     
     for cfh in call_for_heats:
         cfh.poll()
+
+    display.refresh()
 
 
 

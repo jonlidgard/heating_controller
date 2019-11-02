@@ -1,10 +1,10 @@
 import wiringpi, logging, time
 
 class Boiler:
-    def __init__(self):
+    def __init__(self, widget):
         self._pin = 28 
         wiringpi.pinMode(self._pin, 1)
-
+        self._widget = widget
         self._logger = logging.getLogger('heating')
         self._logger.addHandler(logging.NullHandler())
        
@@ -14,10 +14,11 @@ class Boiler:
         if (state != 0 and state != 1):
             raise RuntimeError("State not valid binary")
         wiringpi.digitalWrite(self._pin, 1-state)
+        self._widget.update(state)
 
     def on(self):
         if self.get_state() == 0:
-            self._logger.info('Turning Boiler ON')
+            self._logger.info('Boiler: ON')
             self.set(1)
             self._run_time = time.time()
 
@@ -28,7 +29,7 @@ class Boiler:
                 self._run_time = 0
             else:
                 t = 0
-            self._logger.info('Turning Boiler OFF, runtime: %ds',t)
+            self._logger.info('Boiler: OFF, runtime: %ds',t)
             self.set(0)
 
     def get_state(self):

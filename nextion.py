@@ -3,34 +3,61 @@ import logging
 import time
 
 class StateWriter:
+    def __init__(self):
+        self._state = None
+
     def output(self, state):
-        return
+        return None
+    def colorForState(self, state):
+        return None    
 
 class OnOffStateWriter(StateWriter):
+
     def output(self, state):
+        self._state = state
         return " ON" if state else "OFF"
 
+    def colorForState(self):
+        return 2016 if self._state else 33840    
+
 class ValveStateWriter(StateWriter):
+    STATE_COLORS={'open': 2016, 'opening': 63488, 'closed': 33840, 'closing': 63488}
     def output(self, state):
+        self._state = state
         return state.upper()
 
+    def colorForState(self):
+        if self._state:
+            return self.STATE_COLORS[self._state]
+        else:
+            return None
 
 class TextWidget:
     def __init__(self, widget_id, static, state_writer):
         self._dirty_flag = True
         self._state = ''
-        self._id = id
+        self._id = widget_id
         self._static = static
         self._state_writer= state_writer
 
     def update(self, state):
         self._state = self._state_writer.output(state)
         self._dirty_flag = True
+#        print( self.text())
+
+    def text(self):
+        return self._static + ":" + self._state
+
+    def makeCommand(self, cmd):
+        return 't' + str(self._id) +'.' + cmd +'='
 
     def output(self):
-        self._dirty_flag = False
-        output = self._static + ":" + self._state
-        return 't' + str(self._id) +'.txt="' + output + '"'
+        commands = []
+        if self._id >= 0:
+            self._dirty_flag = False            
+            commands.append(self.makeCommand('txt') + '"' + self.text() + '"')
+            commands.append(self.makeCommand('pco') + str(self._state_writer.colorForState()))
+        return commands
 
     def is_dirty(self):
         return self._dirty_flag
@@ -72,7 +99,9 @@ class Nextion:
     def refresh(self, all = False):
         for widget in self._widgets:
             if all or widget.is_dirty():
-                self.output(widget.output())
+                for cmd in widget.output():
+#                    print(cmd)
+                    self.output(cmd)
 
 
     def output(self,str):
