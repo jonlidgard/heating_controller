@@ -9,6 +9,7 @@ class Boiler:
         self._logger.addHandler(logging.NullHandler())
        
         self._run_time = 0
+        self.set(0)
 
     def set(self, state):
         if (state != 0 and state != 1):

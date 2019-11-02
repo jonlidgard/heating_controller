@@ -2,6 +2,23 @@ import serial
 import logging
 import time
 
+class StatusFile:
+    def __init__(self):
+        self._fh = open("/home/pi/heatingStatus","w+")
+        self._fh.write('')
+        self._fh.close()
+
+    def __del__(self):
+        self._fh.close()
+
+    def update(self, data):
+        self._fh = open("/home/pi/heatingStatus","w+")
+        old_data = self._fh.read()
+        if old_data != data:
+            self._fh.write(data)
+        self._fh.close()
+
+
 class StateWriter:
     def __init__(self):
         self._state = None
@@ -69,6 +86,7 @@ class Nextion:
     def __init__(self):
         self._logger = logging.getLogger('heating')
         self._logger.addHandler(logging.NullHandler())
+        self._statusFile = StatusFile()
 
         self._ser = serial.Serial(
             port='/dev/ttyS0',
@@ -97,11 +115,14 @@ class Nextion:
         return self._ser
 
     def refresh(self, all = False):
+        new_data = ''
         for widget in self._widgets:
+            new_data += widget.text() + '\n'
             if all or widget.is_dirty():
                 for cmd in widget.output():
 #                    print(cmd)
                     self.output(cmd)
+        self._statusFile.update(new_data)
 
 
     def output(self,str):
