@@ -4,18 +4,17 @@ import wiringpi
 import logging
 import time
 import pushover 
-import nextion
-
 
 LIMIT_PINS = [3,4,5]
 ON_TIMEOUT_SECS = 30
 OFF_TIMEOUT_SECS = 30
 
 class ZoneValve:
-    def __init__(self, valve_no, name, widget, notifier):
+    def __init__(self, valve_no, name, notifier):
         self._name = name
-        self._widget = widget
         self._notifier = notifier
+
+
         self._logger = logging.getLogger('heating')
         self._logger.addHandler(logging.NullHandler())
 
@@ -58,12 +57,10 @@ class ZoneValve:
                 state = "closing"
             else:
                 state = "closed"
-
+        
         if (self._valve_state['current'] != state):
             self._valve_state['current'] = state
             self._valve_state['changed'] = True
-            if self._widget:
-                self._widget.update(state)
             if self._logger.isEnabledFor(logging.DEBUG):
                 if self._valve_state == 'open': # Successfully opened
                     if self._motor_on_time > 0:
@@ -110,11 +107,7 @@ class ZoneValve:
             self._motor_off_time = 0
         if self._logger.isEnabledFor(logging.DEBUG):
             self._logger.debug('%s Motor Relay ON',self.get_name())
-        
-        if switch_made:
-            self._notifier(self, self.get_name(), self.get_state())
-        else:
-            self.poll()
+        self.poll()
 
     def close(self):
         self._relay.off()
@@ -124,11 +117,7 @@ class ZoneValve:
             self._motor_on_time = 0
         if self._logger.isEnabledFor(logging.DEBUG):
             self._logger.debug('%s Motor Relay OFF',self.get_name())
-        if switch_made == False:
-            self._notifier(self, self.get_name(), self.get_state())
-        else:
-            self.poll()
-
+        self.poll()
 
     def toggle(self):
         self._relay.toggle()
@@ -152,9 +141,9 @@ if __name__ == "__main__":
     import time
 
     wiringpi.wiringPiSetup()
-    zv1 = ZoneValve(1, 'ufh', None, printState)
-    zv2 = ZoneValve(2, 'downstairs', None, printState)
-    zv3 = ZoneValve(3, 'upstairs', None, printState)
+    zv1 = ZoneValve(1, 'ufh', printState)
+    zv2 = ZoneValve(2, 'downstairs', printState)
+    zv3 = ZoneValve(3, 'upstairs', printState)
     valves = [zv1,zv2,zv3]
 
     print ('UFH: %d, Downstairs: %d, Upstairs: %d', zv1.get_pin_state(), zv2.get_pin_state(), zv3.get_pin_state())
